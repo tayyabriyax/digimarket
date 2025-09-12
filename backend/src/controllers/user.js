@@ -7,7 +7,9 @@ const registerUser = async (req, res) => {
     const { username, email, password } = req.body;
 
     if ([username, email, password].some(field => field.trim() === "")) {
-        throw new ApiError(400, "All fields are required !");
+        return res.status(400).json(
+            new ApiError(400, "All fields are required !")
+        )
     }
 
     const existedUser = await User.findOne({
@@ -15,7 +17,9 @@ const registerUser = async (req, res) => {
     })
 
     if (existedUser) {
-        throw new ApiError(409, "Username or Email already exist !");
+        return res.status(409).json(
+            new ApiError(409, "Username or Email already exist !")
+        )
     }
 
     const newUser = await User.create({
@@ -26,7 +30,7 @@ const registerUser = async (req, res) => {
 
     const createdUser = await User.findById(newUser._id);
 
-    res.status(201).json(
+    return res.status(201).json(
         new ApiResponse(201, createdUser, "User created Successfully !")
     )
 }
@@ -35,24 +39,30 @@ const loginUser = async (req, res) => {
     const { email, password } = req.body;
 
     if ([email, password].some(field => field.trim === "")) {
-        throw new ApiError(400, "Email and Password is required !");
+        return res.status(400).json(
+            new ApiError(400, "Email and Password is required !")
+        )
     }
 
-    const existedUser = await User.findOne({ email });
+    const existedUser = await User.findOne({ email }).select("+password");
 
     if (!existedUser) {
-        throw new ApiError(404, "User not found !");
+        return res.status(404).json(
+            new ApiError(404, "User not found !")
+        )
     }
 
     const isPasswordCorrect = await existedUser.isPasswordCorrect(password);
 
     if (!isPasswordCorrect) {
-        throw new ApiError(403, "Invalid Password !");
+        return res.status(403).json(
+            new ApiError(403, "Invalid Password !")
+        )
     }
 
     const accessToken = await existedUser.generateAccessToken();
 
-    res.status(200).json(
+    return res.status(200).json(
         new ApiResponse(200, accessToken)
     )
 }
@@ -63,10 +73,12 @@ const getUserProfile = async (req, res) => {
     const existedUser = await User.findById(user._id);
 
     if (!existedUser) {
-        throw new ApiError(404, "User not found !");
+        return res.status(404).json(
+            new ApiError(404, "User not found !")
+        )
     }
 
-    res.status(200).json(
+    return res.status(200).json(
         new ApiResponse(200, existedUser)
     )
 }
@@ -88,7 +100,7 @@ const updateUser = async (req, res) => {
             profilePic: profilePicUrl
         });
 
-    res.status(200).json(
+    return res.status(200).json(
         new ApiResponse(200)
     )
 }
@@ -96,7 +108,7 @@ const updateUser = async (req, res) => {
 const getAllUsers = async (req, res) => {
     const users = await User.find();
 
-    res.status(200).json(
+    return res.status(200).json(
         new ApiResponse(200, users)
     )
 }
@@ -107,10 +119,12 @@ const deleteUser = async (req, res) => {
     if (userId) {
         await User.findByIdAndDelete(userId);
     } else {
-        throw new ApiError(404, "User not found !");
+        return res.status(404).json(
+            new ApiError(404, "User not found !")
+        )
     }
 
-    res.status(200).json(
+    return res.status(200).json(
         new ApiResponse(200, "User deleted !")
     )
 }

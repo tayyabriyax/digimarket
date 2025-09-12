@@ -9,11 +9,15 @@ const createAsset = async (req, res) => {
     const { assetImage } = req.files;
 
     if ([title, price, category].some(field => field.trim() === "")) {
-        throw new ApiError(400, "All fields are required !");
+        return res.status(400).json(
+            new ApiError(400, "All fields are required !")
+        )
     }
 
     if (!assetImage) {
-        throw new ApiError(400, "Asset Image is required !");
+        return res.status(400).json(
+            new ApiError(400, "Asset Image is required !")
+        )
     }
 
     const assetImageURLs = await Promise.all(
@@ -29,7 +33,7 @@ const createAsset = async (req, res) => {
         assetImage: assetImageURLs
     });
 
-    res.status(201).json(
+    return res.status(201).json(
         new ApiResponse(201, createdAsset, "Asset uploaded Successfully !")
     )
 }
@@ -39,7 +43,7 @@ const getUsersAllAssets = async (req, res) => {
 
     const assets = await Asset.find({ createdBy: user._id });
 
-    res.status(200).json(
+    return res.status(200).json(
         new ApiResponse(200, assets)
     )
 }
@@ -51,10 +55,12 @@ const deleteUserAssetById = async (req, res) => {
     if (assetId) {
         await Asset.findOneAndDelete({ createdBy: user._id, _id: assetId });
     } else {
-        throw new ApiError(404, "Please insert a valid id !");
+        return res.status(404).json(
+            new ApiError(404, "Asset not found !")
+        )
     }
 
-    res.status(200).json(
+    return res.status(200).json(
         new ApiResponse(200)
     )
 }
@@ -63,12 +69,14 @@ const getAssetById = async (req, res) => {
     const assetId = req.query;
 
     if (!assetId) {
-        throw new ApiError(404, "Please insert a valid id !")
+        return res.status(404).json(
+            new ApiError(404, "Asset not found !")
+        )
     }
 
     const asset = await Asset.findById(assetId);
 
-    res.status(200).json(
+    return res.status(200).json(
         new ApiResponse(200, asset)
     )
 }

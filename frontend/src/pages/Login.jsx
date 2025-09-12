@@ -1,17 +1,28 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import { login } from "../lib/slices/authSlice";
 
 function Login() {
+    const dispatch = useDispatch();
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPass, setShowPass] = useState(false);
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log({ email, password });
-        alert("Login attempted (stubbed)!");
+        dispatch(login({ email, password }));
+        setEmail("");
+        setPassword("");
     };
+
+    const isLoggedIn = useSelector(state => state.auth.IS_LOGGED_IN);
+
+    if (isLoggedIn) {
+        return <Navigate to="/" replace />;
+    }
 
     return (
         <div className="max-w-md mx-auto bg-white shadow-lg rounded-2xl p-8">
