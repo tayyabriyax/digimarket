@@ -81,4 +81,39 @@ const getAssetById = async (req, res) => {
     )
 }
 
-export { createAsset, getUsersAllAssets, deleteUserAssetById, getAssetById };
+const getAssetsByFilters = async (req, res) => {
+    const { name, category, price, page = 1 } = req.query;
+
+    const query = {};
+    if (name) {
+        query.title = new RegExp(`^${name}`, "i");
+    }
+    if (category) {
+        query.category = category;
+    }
+
+    let sort = {};
+    if (price) {
+        sort.price = price === "low_to_high" ? 1 : -1;
+    }
+
+    const limit = 4;
+    const skip = (page - 1) * limit;
+
+    const assets = await Asset.find(query)
+        .sort(sort)
+        .skip(skip)
+        .limit(limit);
+
+    const total = await Asset.countDocuments(query);
+
+    return res.status(200).json(
+        new ApiResponse(200, {
+            assets,
+            total,
+            hasMore: skip + assets.length < total,
+        })
+    );
+}
+
+export { createAsset, getUsersAllAssets, deleteUserAssetById, getAssetById, getAssetsByFilters };

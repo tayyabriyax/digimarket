@@ -1,23 +1,33 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Card from "../components/Card";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchAssets } from "../lib/slices/assetSlice";
 
 function Marketplace() {
+    const dispatch = useDispatch();
+
     const [search, setSearch] = useState("");
-    const [category, setCategory] = useState("all");
-    const [sort, setSort] = useState("latest");
+    const [category, setCategory] = useState("");
+    const [sort, setSort] = useState("low_to_high");
 
-    const assets = [
-        { id: 1, title: "Digital Painting", price: "$30", image: "https://via.placeholder.com/300", category: "art" },
-        { id: 2, title: "Lo-fi Beat", price: "$15", image: "https://via.placeholder.com/300", category: "music" },
-        { id: 3, title: "3D Character Model", price: "$50", image: "https://via.placeholder.com/300", category: "3d" },
-        { id: 4, title: "Ebook: Learn MERN", price: "$20", image: "https://via.placeholder.com/300", category: "ebook" },
-    ];
+    useEffect(() => {
+        dispatch(fetchAssets({ name: search, category, price: sort }));
+    }, [search, category, sort])
 
-    const filteredAssets = assets.filter(asset => {
-        const matchesSearch = asset.title.toLowerCase().includes(search.toLowerCase());
-        const matchesCategory = category === "all" || asset.category === category;
-        return matchesSearch && matchesCategory;
-    });
+    const assets = useSelector(state => state.asset.assets);
+
+    // const assets = [
+    //     { id: 1, title: "Digital Painting", price: "$30", image: "https://via.placeholder.com/300", category: "art" },
+    //     { id: 2, title: "Lo-fi Beat", price: "$15", image: "https://via.placeholder.com/300", category: "music" },
+    //     { id: 3, title: "3D Character Model", price: "$50", image: "https://via.placeholder.com/300", category: "3d" },
+    //     { id: 4, title: "Ebook: Learn MERN", price: "$20", image: "https://via.placeholder.com/300", category: "ebook" },
+    // ];
+
+    // const filteredAssets = assets.filter(asset => {
+    //     const matchesSearch = asset.title.toLowerCase().includes(search.toLowerCase());
+    //     const matchesCategory = category === "all" || asset.category === category;
+    //     return matchesSearch && matchesCategory;
+    // });
 
     return (
         <div className="space-y-10">
@@ -36,7 +46,7 @@ function Marketplace() {
                         onChange={(e) => setCategory(e.target.value)}
                         className="border px-4 py-2 rounded-lg"
                     >
-                        <option value="all">All Categories</option>
+                        <option value="">All Categories</option>
                         <option value="art">Art</option>
                         <option value="music">Music</option>
                         <option value="3d">3D Models</option>
@@ -48,18 +58,17 @@ function Marketplace() {
                         onChange={(e) => setSort(e.target.value)}
                         className="border px-4 py-2 rounded-lg"
                     >
-                        <option value="latest">Latest</option>
-                        <option value="priceLowHigh">Price: Low to High</option>
-                        <option value="priceHighLow">Price: High to Low</option>
+                        <option value="low_to_high">Price: Low to High</option>
+                        <option value="high_to_low">Price: High to Low</option>
                     </select>
                 </div>
             </section>
 
             <section>
-                {filteredAssets.length > 0 ? (
+                {assets.length > 0 ? (
                     <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                        {filteredAssets.map(asset => (
-                            <Card key={asset.id} id={asset.id} title={asset.title} price={asset.price} image={asset.image} />
+                        {assets.map(asset => (
+                            <Card key={asset._id} id={asset.id} title={asset.title} price={asset.price} image={asset.assetImage[0]} />
                         ))}
                     </div>
                 ) : (
