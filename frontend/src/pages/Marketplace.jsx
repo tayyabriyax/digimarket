@@ -15,19 +15,7 @@ function Marketplace() {
     }, [search, category, sort])
 
     const assets = useSelector(state => state.asset.assets);
-
-    // const assets = [
-    //     { id: 1, title: "Digital Painting", price: "$30", image: "https://via.placeholder.com/300", category: "art" },
-    //     { id: 2, title: "Lo-fi Beat", price: "$15", image: "https://via.placeholder.com/300", category: "music" },
-    //     { id: 3, title: "3D Character Model", price: "$50", image: "https://via.placeholder.com/300", category: "3d" },
-    //     { id: 4, title: "Ebook: Learn MERN", price: "$20", image: "https://via.placeholder.com/300", category: "ebook" },
-    // ];
-
-    // const filteredAssets = assets.filter(asset => {
-    //     const matchesSearch = asset.title.toLowerCase().includes(search.toLowerCase());
-    //     const matchesCategory = category === "all" || asset.category === category;
-    //     return matchesSearch && matchesCategory;
-    // });
+    const assetData = useSelector(state => state.asset.assetData);
 
     return (
         <div className="space-y-10">
@@ -49,7 +37,7 @@ function Marketplace() {
                         <option value="">All Categories</option>
                         <option value="art">Art</option>
                         <option value="music">Music</option>
-                        <option value="3d">3D Models</option>
+                        <option value="3dmodel">3D Models</option>
                         <option value="ebook">Ebooks</option>
                     </select>
 
@@ -76,11 +64,14 @@ function Marketplace() {
                 )}
             </section>
 
-            <div className="text-center">
-                <button className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                    Load More
-                </button>
-            </div>
+            {
+                assetData.hasMore &&
+                <div className="text-center">
+                    <button className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                        Load More
+                    </button>
+                </div>
+            }
         </div>
     );
 }

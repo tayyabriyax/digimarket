@@ -36,7 +36,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/marketplace" element={<Marketplace />} />
-            <Route path="/asset/:id" element={<AssetDetails />} />
+            <Route path="/asset/:id" element={<Auth><AssetDetails /> </Auth>} />
             <Route path="/profile/:username" element={<Profile />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/upload" element={<Auth> <UploadAsset /> </Auth>} />

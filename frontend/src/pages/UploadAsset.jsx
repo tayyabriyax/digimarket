@@ -1,25 +1,29 @@
 import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { uploadAssets } from "../lib/slices/assetSlice";
 
 function UploadAsset() {
+    const dispatch = useDispatch();
+
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [price, setPrice] = useState("");
     const [category, setCategory] = useState("art");
-    const [image, setImage] = useState(null);
+    const [image, setImage] = useState([]);
     const [preview, setPreview] = useState(null);
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
-            setImage(file);
+            setImage(prev => [...prev, file]);
+            console.log(file)
             setPreview(URL.createObjectURL(file));
         }
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log({ title, description, price, category, image });
-        alert("Asset uploaded (stubbed)!");
+        dispatch(uploadAssets({ title, description, price, category, image }));
     };
 
     return (
